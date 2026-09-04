@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title data-t="pageTitle">Laufbursche NAVEE Firmware</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Laufbursche <span data-t="brandSub">NAVEE Firmware</span></h1>
+    <div class="head-right">
+      <span class="status" id="status" data-state="disconnected">disconnected</span>
+      <div class="head-tools">
+        <button type="button" class="theme-btn" id="btn-theme">&#9728;</button>
+        <div class="langs" id="langs" role="group">
+          <button type="button" data-lang="de" aria-pressed="true">DE</button>
+          <button type="button" data-lang="en" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2 data-t="s1Title"></h2>
+    <p class="hint" data-t="sub"></p>
+    <p class="hint" data-t="startHintGuide"></p>
+    <p class="warn" data-t="expWarn"></p>
+    <p class="hint" data-t="ownDevice"></p>
+  </div>
+
+  <!-- Step 1: connect and detect the model -->
+  <div class="card" id="connect-card">
+    <div class="card-head"><h2 data-t="conTitle"></h2><button type="button" class="help-btn" data-help="connect" aria-label="Info">?</button></div>
+    <p class="hint" data-t="conHint"></p>
+    <div class="fw-file"><span class="res-k" data-t="conModelK"></span> <span id="con-model" class="mono" data-t="conModelWait"></span></div>
+    <div class="btns">
+      <button type="button" id="btn-connect" class="primary span2" data-t="btnConnect"></button>
+    </div>
+    <p id="con-msg" class="hint" hidden></p>
+  </div>
+
+  <!-- Step 2: download the stock firmware for the detected model -->
+  <div class="card" id="dl-card">
+    <h2 data-t="dlTitle"></h2>
+    <div class="fw-file"><span class="res-k" data-t="dlForK"></span> <span id="dl-model" class="mono" data-t="conModelWait"></span></div>
+    <p class="hint" data-t="dlIntro"></p>
+    <div id="dl-variants" hidden>
+      <p class="hint" data-t="dlPickVariant"></p>
+      <div id="dl-variant-btns" class="btns"></div>
+    </div>
+    <div id="dl-files"></div>
+    <p id="dl-msg" class="hint" hidden></p>
+    <p class="hint" data-t="dlNote"></p>
+  </div>
+
+  <!-- Step 3 + 4: upload the saved .bin and patch it -->
+  <div class="card">
+    <h2 data-t="s2Title"></h2>
+    <p class="hint" data-t="loadHint"></p>
+    <div class="row">
+      <input type="file" id="fw-in" accept=".bin,application/octet-stream">
+    </div>
+    <div id="result" class="result" hidden>
+      <div class="res-line"><span class="res-k" data-t="resModel"></span> <span id="res-model" class="mono"></span></div>
+      <div class="res-line"><span class="res-k" data-t="resPatches"></span> <span id="res-patches" class="mono"></span></div>
+      <p id="res-note" class="hint"></p>
+      <div class="btns"><button type="button" id="btn-save" class="primary span2"></button></div>
+    </div>
+    <p id="err" class="err" hidden></p>
+  </div>
+
+  <!-- Step 5: flash the patched image to the connected scooter -->
+  <div class="card" id="flash-card">
+    <div class="card-head"><h2 data-t="s3Title"></h2><button type="button" class="help-btn" data-help="flash" aria-label="Info">?</button></div>
+    <p class="warn" data-t="flashIntro"></p>
+    <div class="fw-file"><span class="res-k" data-t="flashFileK"></span> <span id="flash-file" class="mono" data-t="flashNoFile"></span></div>
+    <label class="consent-row">
+      <input type="checkbox" id="flash-consent">
+      <span data-t="flashConsent"></span>
+    </label>
+    <div class="btns">
+      <button type="button" id="btn-flash" class="primary span2" data-t="btnFlash" disabled></button>
+    </div>
+    <div id="flash-progress" hidden>
+      <div class="fw-bar"><div id="flash-bar"></div></div>
+      <div class="prog-line"><span id="flash-pct" class="mono">0%</span> <span id="flash-phase" class="hint"></span></div>
+      <div class="btns"><button type="button" id="btn-cancel" class="span2" data-t="btnCancel"></button></div>
+    </div>
+  </div>
+
+  <!-- Protocol log: full BLE wire activity (TX/RX) plus status messages -->
+  <div class="card">
+    <h2 data-t="s6Title"></h2>
+    <div class="btns">
+      <button type="button" id="btn-copy-log" data-t="btnCopyLog"></button>
+      <button type="button" id="btn-clear-log" data-t="btnClearLog"></button>
+    </div>
+    <pre id="log"></pre>
+    <p class="hint"><span class="log-tx" data-t="logTxLegend"></span>, <span class="log-rx" data-t="logRxLegend"></span></p>
+  </div>
+
+  <footer class="foot">
+    <span class="footlinks">
+      <a id="link-guide" href="GUIDE.de.md" data-doc="GUIDE" data-t="footGuide"></a>
+      <a href="https://github.com/Laufbursche42/nv-fw" target="_blank" rel="noopener" data-t="footSource"></a>
+      <a id="link-readme" href="README.md" data-doc="README" data-t="footReadme"></a>
+      <a id="link-disclaimer" href="#" data-t="footDisclaimer"></a>
+      <a id="link-license" href="LICENSE.de.md" data-doc="LICENSE" data-t="footLicense"></a>
+      <a id="link-privacy" href="PRIVACY.de.md" data-doc="PRIVACY" data-t="footPrivacy"></a>
+      <a id="link-trademarks" href="TRADEMARKS.de.md" data-doc="TRADEMARKS" data-t="footTrademarks"></a>
+    </span>
+    <span class="ver" id="build-ver"></span>
+  </footer>
+</div>
+
+<dialog id="doc" aria-labelledby="doc-title">
+  <div class="doc-head">
+    <h3 id="doc-title"></h3>
+    <button type="button" id="doc-x">&times;</button>
+  </div>
+  <div class="doc-body" id="doc-body"></div>
+  <div class="doc-foot">
+    <button type="button" id="doc-close" data-t="docClose"></button>
+  </div>
+</dialog>
+
+<dialog id="help" aria-labelledby="help-title">
+  <div class="doc-head">
+    <h3 id="help-title"></h3>
+    <button type="button" id="help-x">&times;</button>
+  </div>
+  <div class="doc-body" id="help-body"></div>
+  <div class="doc-foot">
+    <button type="button" id="help-close" data-t="docClose"></button>
+  </div>
+</dialog>
+
+<script src="i18n.js?v=1"></script>
+<script src="patcher.js?v=1"></script>
+<script src="flasher.js?v=1"></script>
+<script src="fw_manifest.js?v=1"></script>
+<script src="page.js?v=1"></script>
+</body>
+</html>

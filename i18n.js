@@ -7,6 +7,7 @@ window.I18N = {
     themeToLight: "Auf helle Darstellung umschalten",
     themeToDark: "Auf dunkle Darstellung umschalten",
 
+    iosOnly: "<b>Dieses Tool ist für iPhone und iPad.</b> Es läuft im Browser Bluefy - Safari kann kein Bluetooth. Android-Nutzer nehmen bitte die App: sie patcht und flasht direkt, ohne Umweg über den Browser.",
     s1Title: "Was das ist",
     sub: "Diese Seite baut aus der Original-Firmware deines NAVEE-Scooters eine entdrosselte Version - Speed-Freischaltung, Kickstart und Tempomat. Sie ist für alle NAVEE-Modelle gedacht. Aktuell testen wir den NT5 Max. Nach und nach stellen wir Patches für weitere Modelle bereit. Alles läuft im Browser, nichts wird hochgeladen oder auf einem Server gespeichert.",
     expWarn: "Machbarkeitsstudie: Diese Seite zeigt, was sich aus der Firmware eines NAVEE-Scooters herausholen lässt, sie ist kein fertiges Produkt. Fehlerfreier Betrieb wird nicht versprochen, es gibt keinerlei Gewährleistung. Was du hier baust und flashst, tust du auf eigenes Risiko. <a href=\"#\" data-open-disclaimer>Haftungsausschluss lesen</a>. Probleme oder Fehler bitte als <a href=\"https://github.com/Laufbursche42/nv-fw/issues\" target=\"_blank\" rel=\"noopener\">GitHub-Issue</a> melden.",
@@ -20,7 +21,7 @@ window.I18N = {
     conModelNone: "Modell nicht erkannt",
     conModelUnknown: "unbekannt (pid %s)",
     conNoModel: "Seriennummer konnte nicht gelesen werden. Das Modell bleibt unbekannt, du kannst trotzdem fortfahren.",
-    connectHelp: "<p>Beim Verbinden erscheint dein Scooter unter seinem Namen (NAVEE...), genau wie in der offiziellen App. Taucht er nicht auf, schalte ihn ein und halte ihn nah ans Telefon.</p><p>Die Seite liest nur die Seriennummer und leitet daraus das Modell ab. So weiß sie, welche Original-Firmware zu deinem Gerät passt.</p><p>Web Bluetooth gibt es in Chrome oder Edge auf Android und am Rechner. Safari und Firefox unterstützen es nicht.</p>",
+    connectHelp: "<p>Beim Verbinden erscheint dein Scooter unter seinem Namen (NAVEE...), genau wie in der offiziellen App. Taucht er nicht auf, schalte ihn ein und halte ihn nah ans Telefon.</p><p>Die Seite liest nur die Seriennummer und leitet daraus das Modell ab. So weiß sie, welche Original-Firmware zu deinem Gerät passt.</p><p>Auf dem iPhone oder iPad brauchst du den Browser Bluefy. Safari unterstützt Web Bluetooth nicht.</p>",
 
     dlTitle: "Original-Firmware herunterladen",
     dlForK: "Firmware für:",
@@ -63,7 +64,7 @@ window.I18N = {
     flPhError: "Fehler",
 
     flOk: "Flash abgeschlossen. Prüfe die neue Version am Scooter.",
-    flErrNoBluetooth: "Dieser Browser unterstützt Web Bluetooth nicht. Nutze Chrome oder Edge auf Android oder am Rechner.",
+    flErrNoBluetooth: "Dieser Browser unterstützt Web Bluetooth nicht. Auf dem iPhone oder iPad nutze den Browser Bluefy.",
     flErrNotConnected: "Nicht verbunden.",
     flErrSn: "Seriennummer konnte nicht gelesen werden.",
     flErrBound: "Der Scooter ist an ein Konto gebunden und hat die Authentifizierung abgelehnt (Fehler 255). Ein ungebundener Scooter wird ohne Weiteres angenommen.",
@@ -114,6 +115,7 @@ window.I18N = {
     themeToDark: "Switch to dark theme",
 
     s1Title: "What this is",
+    iosOnly: "<b>This tool is for iPhone and iPad.</b> It runs in the Bluefy browser - Safari has no Bluetooth. Android users should use the app instead: it patches and flashes directly, with no browser detour.",
     sub: "This page builds an unlocked firmware from your NAVEE scooter's own stock image - speed unlock, kickstart and cruise. It is meant for all NAVEE models. We are currently testing the NT5 Max; step by step we add patches for more models. Everything runs in the browser; nothing is uploaded or stored on a server.",
     expWarn: "Feasibility study: this page shows what can be pulled out of a NAVEE scooter's firmware, it is not a finished product. Error-free operation is not promised and there is no warranty of any kind. Whatever you build and flash here, you do at your own risk. <a href=\"#\" data-open-disclaimer>Read the disclaimer</a>. Report problems or errors as a <a href=\"https://github.com/Laufbursche42/nv-fw/issues\" target=\"_blank\" rel=\"noopener\">GitHub issue</a>.",
     startHintGuide: "New here? Every step is in the <a href=\"GUIDE.en.md\" data-doc=\"GUIDE\" data-t=\"footGuide\">guide</a>.",
@@ -126,7 +128,7 @@ window.I18N = {
     conModelNone: "model not detected",
     conModelUnknown: "unknown (pid %s)",
     conNoModel: "Could not read the serial number. The model stays unknown; you can still continue.",
-    connectHelp: "<p>When connecting, your scooter shows up by its name (NAVEE...), exactly as in the official app. If it does not appear, switch it on and hold it close to the phone.</p><p>The page only reads the serial number and derives the model from it, so it knows which stock firmware fits your device.</p><p>Web Bluetooth is available in Chrome or Edge on Android and on a computer. Safari and Firefox do not support it.</p>",
+    connectHelp: "<p>When connecting, your scooter shows up by its name (NAVEE...), exactly as in the official app. If it does not appear, switch it on and hold it close to the phone.</p><p>The page only reads the serial number and derives the model from it, so it knows which stock firmware fits your device.</p><p>On iPhone or iPad you need the Bluefy browser. Safari does not support Web Bluetooth.</p>",
 
     dlTitle: "Download stock firmware",
     dlForK: "Firmware for:",
@@ -169,7 +171,7 @@ window.I18N = {
     flPhError: "error",
 
     flOk: "Flash complete. Check the new version on the scooter.",
-    flErrNoBluetooth: "This browser does not support Web Bluetooth. Use Chrome or Edge on Android or on a computer.",
+    flErrNoBluetooth: "This browser does not support Web Bluetooth. On iPhone or iPad, use the Bluefy browser.",
     flErrNotConnected: "Not connected.",
     flErrSn: "Could not read the serial number.",
     flErrBound: "The scooter is bound to an account and rejected the authentication (error 255). An unbound scooter is accepted right away.",

@@ -5,8 +5,8 @@ A step-by-step walkthrough of the Laufbursche NAVEE firmware tool. The page buil
 ## What you need
 
 - A NAVEE scooter. Turn it on and keep it within a few meters.
-- A browser with Web Bluetooth: **Chrome** or **Edge** on Android or desktop. Safari and Firefox do not support Web Bluetooth and cannot flash.
-- Bluetooth switched on. On Android, location permission has to be granted to the browser for a Bluetooth scan.
+- An iPhone or iPad with the **Bluefy** browser (Safari has no Web Bluetooth). Android users take the app instead of this page.
+- Bluetooth switched on.
 
 ## Which models
 
@@ -40,7 +40,7 @@ An interruption mid-transfer is harmless - the scooter only commits an image aft
 
 ## Troubleshooting
 
-- **The scooter is not in the chooser.** Make sure it is on and close, Bluetooth is on, and on Android the browser has location permission.
+- **The scooter is not in the chooser.** Make sure it is on and close, and Bluetooth is on.
 - **Error 255 while connecting or flashing.** The scooter is bound to an account and rejects the random key. An unbound scooter is accepted right away.
 - **The file is refused.** Then it is not a matching stock .bin, or it is already patched. Download the fresh stock image for your model again.
 - **The flash aborts.** Keep the link stable (screen on, browser in front, close to the phone) and try again. The scooter stays operable as long as no fully checked image has been committed.

@@ -5,8 +5,8 @@ Schritt für Schritt durch das Laufbursche NAVEE Firmware-Werkzeug. Die Seite ba
 ## Was du brauchst
 
 - Einen NAVEE-Scooter. Einschalten und in wenigen Metern Reichweite halten.
-- Einen Browser mit Web Bluetooth: **Chrome** oder **Edge** auf Android oder Desktop. Safari und Firefox unterstützen Web Bluetooth nicht und können nicht flashen.
-- Bluetooth eingeschaltet. Auf Android braucht der Browser die Standortfreigabe für den Bluetooth-Scan.
+- Ein iPhone oder iPad mit dem Browser **Bluefy** (Safari kann kein Web Bluetooth). Android-Nutzer nehmen die App statt dieser Seite.
+- Bluetooth eingeschaltet.
 
 ## Für welche Modelle
 
@@ -40,7 +40,7 @@ Ein Abbruch mitten in der Übertragung ist unkritisch - der Scooter übernimmt e
 
 ## Fehlersuche
 
-- **Der Scooter fehlt im Dialog.** Sicherstellen, dass er an und nah ist, Bluetooth aktiv ist und der Browser auf Android die Standortfreigabe hat.
+- **Der Scooter fehlt im Dialog.** Sicherstellen, dass er an und nah ist und Bluetooth aktiv ist.
 - **Fehler 255 beim Verbinden oder Flashen.** Der Scooter ist an ein Konto gebunden und lehnt den Zufallsschlüssel ab. Ein ungebundener Scooter wird ohne Weiteres angenommen.
 - **Die Datei wird abgelehnt.** Dann ist es keine passende Original-.bin oder sie ist schon gepatcht. Lade das frische Original für dein Modell erneut herunter.
 - **Der Flash bricht ab.** Verbindung stabil halten (Display an, Browser vorn, nah am Telefon) und erneut versuchen. Der Scooter bleibt lauffähig, solange kein vollständig geprüftes Abbild übernommen wurde.

@@ -1,6 +1,8 @@
 # Laufbursche NAVEE Firmware
 
-A static web page that builds a tuned firmware for a NAVEE scooter and flashes it over Web Bluetooth. It downloads the stock firmware for your model, patches it in the browser (speed unlock, kickstart and cruise) and writes it back to the scooter over Bluetooth. Nothing to install: no app store, no signing, no developer account. It runs in **Chrome** or **Edge** on Android or desktop. The page is bilingual (German/English, switch in the header) and German is the default.
+A static web page that builds a tuned firmware for a NAVEE scooter and flashes it over Web Bluetooth. It downloads the stock firmware for your model, patches it in the browser (speed unlock, kickstart and cruise) and writes it back to the scooter over Bluetooth. Nothing to install: no app store, no signing, no developer account. The page is bilingual (German/English, switch in the header) and German is the default.
+
+> **For iPhone and iPad.** This tool runs in the **Bluefy** browser, because Safari has no Web Bluetooth. **Android users should use the app instead** - it patches and flashes directly, with no browser detour.
 
 > **This is a feasibility study.** It exists to show what a NAVEE scooter's firmware makes possible, not to be a finished product. Error-free operation is not promised and there is no warranty of any kind. Whatever you build and flash, you do at your own risk.
 
@@ -25,10 +27,8 @@ The page is meant for **all NAVEE scooter models**. Right now the **NT5 Max** is
 
 ## Browser support
 
-- **Android or desktop:** **Chrome** or **Edge** (or another Chromium browser). Web Bluetooth is built in.
-- On Android the browser needs location permission for the Bluetooth scan.
-
-Safari and Firefox do not support Web Bluetooth and cannot flash.
+- **iPhone or iPad:** the **Bluefy** browser. Safari has no Web Bluetooth and cannot flash.
+- **Android:** use the app instead of this page - it patches and flashes directly.
 
 ## Authentication
 

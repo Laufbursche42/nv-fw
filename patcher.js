@@ -1,9 +1,9 @@
 'use strict';
-// NAVEE firmware patcher: identify a stock .bin, apply the byte-table patches, reseal the
-// header with a fresh CRC-16/XMODEM. A wrong or already-patched image is refused. Speed patches
-// differ per BLDC family; the board-magic gate blocks cross-flashing between families.
+// NAVEE firmware patcher. Loads a stock .bin, identifies the NT5 variant, checks it against a
+// fingerprint, applies the byte-table patches and re-seals the image with a fresh CRC. A wrong
+// or already-patched image is refused, not modified. Raw .bin, CRC-16/XMODEM.
 
-// ---- CRC-16/XMODEM: poly 0x1021, init 0x0000, non-reflected, big-endian on the wire ----
+// CRC-16/XMODEM: poly 0x1021, init 0x0000, non-reflected, big-endian on the wire.
 function crc16Xmodem(bytes, start, end) {
   let crc = 0;
   for (let i = start; i < end; i++) {
@@ -32,83 +32,170 @@ function bytesAt(u8, off, arr) {
 }
 function ascii(s) { return Array.from(s).map(c => c.charCodeAt(0)); }
 
-// ---- The three approved NAVEE NT5 Max firmware images ----
-// Each entry: how to recognise it, how to verify it is untouched stock, how to re-seal it,
-// and which byte-table patches apply. Meter is shared by both variants; BLDC is split.
+// Meter reseal: 24-bit body length @0x10, CRC-16/XMODEM over [0x400,EOF) @0x13. Body base 0x400.
+function meterReseal(u8) {
+  const eof = u8.length;
+  beWrite(u8, 0x10, 3, eof - 0x400);
+  beWrite(u8, 0x13, 2, crc16Xmodem(u8, 0x400, eof));
+}
+// ERPM-governor BLDC reseal: primary CRC-16/XMODEM over [0x100,0x100+len) @0xb0 only.
+function bldcResealErpm(u8) {
+  const len = beRead(u8, 0x84, 4);
+  beWrite(u8, 0xb0, 2, crc16Xmodem(u8, 0x100, 0x100 + len));
+}
+// LZ-.data BLDC reseal: primary @0xb0 over [0x100,0x100+len), then secondary @0x13 over [0x80,EOF).
+// Secondary runs last because @0xb0 lies inside [0x80,EOF).
+function bldcResealLz(u8) {
+  const len = beRead(u8, 0x84, 4);
+  beWrite(u8, 0xb0, 2, crc16Xmodem(u8, 0x100, 0x100 + len));
+  beWrite(u8, 0x13, 2, crc16Xmodem(u8, 0x80, u8.length));
+}
+
+// Each entry: recognise the image, verify it is untouched stock, re-seal it, patch it.
+// Board magics and the T2202 meter tag are shared within a family, so BLDC entries pin the exact
+// build by the 4-byte version word @0x80 and meter entries by size plus the stock CRC @0x13.
 const IMAGES = {
 
-  // Display/meter, byte-identical across 9301 and 9701. Carries kickstart + cruise.
-  meter: {
+  // Meter 3.0.2.2, NT5 Max (9301 / 9701). 150528 bytes. Carries kickstart plus cruise.
+  meterMax: {
     label: 'NT5 Max meter 3.0.2.2',
     kind: 'meter',
-    // 16-byte OTA header: tag "T2202" at 0x00, then type/version; body base 0x400.
-    match: (u8) => u8.length > 0x14 && bytesAt(u8, 0, ascii('T2202')),
-    verify: { size: 0x24C00 /* EOF = bodyBase 0x400 + len 0x24800 = 150528 */, crcOff: 0x13, crcStock: 0xe7ab, lenOff: 0x10, lenStock: 0x024800 },
+    match: (u8) => u8.length === 0x24C00 && bytesAt(u8, 0, ascii('T2202')) && beRead(u8, 0x13, 2) === 0xe7ab,
+    verify: { size: 0x24C00, crcOff: 0x13, crcStock: 0xe7ab, lenOff: 0x10, lenStock: 0x024800 },
     bodyBase: 0x400,
-    // reseal: body length as BE-24 @0x10, CRC-16/XMODEM over [0x400,EOF) as BE-16 @0x13.
-    reseal: (u8) => {
-      const eof = u8.length;
-      beWrite(u8, 0x10, 3, eof - 0x400);
-      beWrite(u8, 0x13, 2, crc16Xmodem(u8, 0x400, eof));
-    },
+    reseal: meterReseal,
     patches: [
-      // Kickstart / zero-start: bcs -> b, skip the <3->3 region clamp (regionless zero-start).
       { off: 0x14bf3, from: [0xd2], to: [0xe0], id: 'kickstart' },
-      // Cruise / Tempomat: first beq store -> unconditional b store (stores cruise in every region).
       { off: 0x14679, from: [0xd0], to: [0xe0], id: 'cruise' },
+      { off: 0x14d6e, from: [0x33], to: [0x35], id: 'version-marker' }, // reported meter version 3.0.2.2 -> 5.0.2.2
     ],
   },
 
-  // BLDC 9701 (bldc 0.0.1.0). ERPM-governor cap; four cmp.w sites raise 39.0 -> 50.8.
+  // Meter 3.0.2.2, NT5 Turbo (11101) / Ultra (9401), byte-identical. 149504 bytes.
+  meterTurboUltra: {
+    label: 'NT5 Turbo / Ultra meter 3.0.2.2',
+    kind: 'meter',
+    match: (u8) => u8.length === 0x24800 && bytesAt(u8, 0, ascii('T2202')) && beRead(u8, 0x13, 2) === 0xce12,
+    verify: { size: 0x24800, crcOff: 0x13, crcStock: 0xce12, lenOff: 0x10, lenStock: 0x024400 },
+    bodyBase: 0x400,
+    reseal: meterReseal,
+    patches: [
+      { off: 0x14b9f, from: [0xd2], to: [0xe0], id: 'kickstart' },
+      { off: 0x14631, from: [0xd0], to: [0xe0], id: 'cruise' },
+    ],
+  },
+
+  // Meter 3.0.2.2, NT5 Max+ (9201). Same 149504 size as Turbo/Ultra but a different build (CRC 0x0f34).
+  meterMaxPlus: {
+    label: 'NT5 Max+ meter 3.0.2.2',
+    kind: 'meter',
+    match: (u8) => u8.length === 0x24800 && bytesAt(u8, 0, ascii('T2202')) && beRead(u8, 0x13, 2) === 0x0f34,
+    verify: { size: 0x24800, crcOff: 0x13, crcStock: 0x0f34, lenOff: 0x10, lenStock: 0x024400 },
+    bodyBase: 0x400,
+    reseal: meterReseal,
+    patches: [
+      { off: 0x14ba3, from: [0xd2], to: [0xe0], id: 'kickstart' },
+      { off: 0x14635, from: [0xd0], to: [0xe0], id: 'cruise' },
+    ],
+  },
+
+  // Meter 3.0.1.6, NT5 Ultra X (9501). 148480 bytes. This build predates the kickstart/cruise
+  // region handling, so there is nothing to patch; the entry only identifies the image.
+  meterUltraX: {
+    label: 'NT5 Ultra X meter 3.0.1.6',
+    kind: 'meter',
+    match: (u8) => u8.length === 0x24400 && bytesAt(u8, 0, ascii('T2202')) && beRead(u8, 0x13, 2) === 0x9f3a,
+    verify: { size: 0x24400, crcOff: 0x13, crcStock: 0x9f3a, lenOff: 0x10, lenStock: 0x024000 },
+    bodyBase: 0x400,
+    reseal: meterReseal,
+    patches: [],
+  },
+
+  // BLDC 9701 (bldc 0.0.1.0, NT5 Max). ERPM-governor cap; four cmp.w sites raise 39.0 -> 50.8.
+  // Magic collides with 9401; the version word @0x80 (00 00 01 00) splits them.
   bldc9701: {
     label: 'NT5 Max BLDC 0.0.1.0 (9701)',
     kind: 'bldc',
-    // 16-byte board magic at 0x90 uniquely identifies the family (blocks cross-flashing).
-    match: (u8) => u8.length > 0xa0 && bytesAt(u8, 0x90, ascii('SZMC-ES-ZM-3553G')),
-    // body length u32 BE @0x84; primary CRC-16/XMODEM @0xb0 over [0x100, 0x100+len).
-    verify: { lenOff: 0x84, lenStock: 0x0000f800, crcOff: 0xb0, crcStock: 0xc064 },
-    reseal: (u8) => {
-      const len = beRead(u8, 0x84, 4);
-      beWrite(u8, 0xb0, 2, crc16Xmodem(u8, 0x100, 0x100 + len));
-      // secondary field @0x13 ships as garbage on this family and is ignored by the loader.
-      // leave it exactly as stock (do NOT recompute - that would deviate from a factory image).
-    },
+    match: (u8) => u8.length > 0xa0 && bytesAt(u8, 0x90, ascii('SZMC-ES-ZM-3553G')) && bytesAt(u8, 0x80, [0x00, 0x00, 0x01, 0x00]),
+    verify: { size: 0xf900, lenOff: 0x84, lenStock: 0x0000f800, crcOff: 0xb0, crcStock: 0xc064 },
+    reseal: bldcResealErpm,
     patches: [
-      { off: 0x37fe, from: [0xb9, 0xf5, 0xc3, 0x7f], to: [0xb9, 0xf5, 0xfe, 0x7f], id: 'speed-390a' }, // 39.0->50.8
+      { off: 0x37fe, from: [0xb9, 0xf5, 0xc3, 0x7f], to: [0xb9, 0xf5, 0xfe, 0x7f], id: 'speed-390a' },
       { off: 0x3a7a, from: [0xb6, 0xf5, 0xc3, 0x7f], to: [0xb6, 0xf5, 0xfe, 0x7f], id: 'speed-390b' },
       { off: 0x4f62, from: [0xb4, 0xf5, 0xc3, 0x7f], to: [0xb4, 0xf5, 0xfe, 0x7f], id: 'speed-390c' },
-      { off: 0x4f7c, from: [0xb4, 0xf5, 0xd2, 0x7f], to: [0xb4, 0xf5, 0x08, 0x7f], id: 'speed-420' },   // 42.0->54.4 margin
+      { off: 0x4f7c, from: [0xb4, 0xf5, 0xd2, 0x7f], to: [0xb4, 0xf5, 0x08, 0x7f], id: 'speed-420' },
     ],
   },
 
-  // BLDC 9301 (bldc 0.0.0.6). The cap1 open-region table lives in the LZ-compressed .data image;
-  // its open words decode to literal bytes in the compressed stream and are edited in place.
+  // BLDC 9401 (bldc 0.0.0.5, NT5 Ultra). ERPM-governor cap, same four sites as 9701 shifted earlier.
+  // Magic collides with 9701; version word @0x80 (00 00 00 05) splits them.
+  bldc9401: {
+    label: 'NT5 Ultra BLDC 0.0.0.5 (9401)',
+    kind: 'bldc',
+    match: (u8) => u8.length > 0xa0 && bytesAt(u8, 0x90, ascii('SZMC-ES-ZM-3553G')) && bytesAt(u8, 0x80, [0x00, 0x00, 0x00, 0x05]),
+    verify: { size: 0xf900, lenOff: 0x84, lenStock: 0x0000f800, crcOff: 0xb0, crcStock: 0x14d4 },
+    reseal: bldcResealErpm,
+    patches: [
+      { off: 0x3616, from: [0xb9, 0xf5, 0xc3, 0x7f], to: [0xb9, 0xf5, 0xfe, 0x7f], id: 'speed-390a' },
+      { off: 0x3892, from: [0xb6, 0xf5, 0xc3, 0x7f], to: [0xb6, 0xf5, 0xfe, 0x7f], id: 'speed-390b' },
+      { off: 0x4d2a, from: [0xb4, 0xf5, 0xc3, 0x7f], to: [0xb4, 0xf5, 0xfe, 0x7f], id: 'speed-390c' },
+      { off: 0x4d44, from: [0xb4, 0xf5, 0xd2, 0x7f], to: [0xb4, 0xf5, 0x08, 0x7f], id: 'speed-420' },
+    ],
+  },
+
+  // BLDC 9301 (bldc 0.0.0.6, NT5 Max). LZ-.data cap1 open words 0x031b->0x0416 (795->1046).
+  // Magic collides with 9201/11101; version word @0x80 (00 00 00 06) splits them.
   bldc9301: {
     label: 'NT5 Max BLDC 0.0.0.6 (9301)',
     kind: 'bldc',
-    match: (u8) => u8.length > 0xa0 && bytesAt(u8, 0x90, ascii('SZMC-ES-ZM-02831')),
-    verify: { lenOff: 0x84, lenStock: 0x0000bf40, crcOff: 0xb0, crcStock: 0x122b },
-    reseal: (u8) => {
-      const len = beRead(u8, 0x84, 4);
-      beWrite(u8, 0xb0, 2, crc16Xmodem(u8, 0x100, 0x100 + len));
-      // secondary CRC-16/XMODEM @0x13 over [0x80,EOF) is populated on this family -> recompute.
-      beWrite(u8, 0x13, 2, crc16Xmodem(u8, 0x80, u8.length));
-    },
+    match: (u8) => u8.length > 0xa0 && bytesAt(u8, 0x90, ascii('SZMC-ES-ZM-02831')) && bytesAt(u8, 0x80, [0x00, 0x00, 0x00, 0x06]),
+    verify: { size: 0xc080, lenOff: 0x84, lenStock: 0x0000bf40, crcOff: 0xb0, crcStock: 0x122b },
+    reseal: bldcResealLz,
     patches: [
-      // cap1 open words 0x031b->0x0416 (795->1046, ~38.1->50.1 km/h), stored as LZ literals in .data
-      { off: 0xc01a, from: [0x1b, 0x03], to: [0x16, 0x04], id: 'speed-open-a' }, // cap1[0]; cap1[10] via backref
-      { off: 0xc024, from: [0x1b, 0x03], to: [0x16, 0x04], id: 'speed-open-b' }, // cap1[6]
+      // capZ lock/unlock, boot-throttled. The region matcher writes the top-speed clamp at
+      // 0x2000035a; NOP its two stores and drive capZ ourselves. An inline setter in the drive-frame
+      // block writes capZ = 400 (locked ~22 km/h), or 800 (open ~44) when the mode nibble is 5. A
+      // boot-init stub (reached by redirecting the boot thunk's literal) seeds capZ = 400 after
+      // scatterload and before main, so the scooter boots rideable at ~22, unlocks to ~44 on the
+      // app's speed release, and re-locks to ~22 on every reboot (RAM-volatile).
+      { off: 0x4be4, from: [0x01, 0x80], to: [0x00, 0xbf], id: 'capz-nop-matcher-a' },
+      { off: 0x4c00, from: [0x02, 0x80], to: [0x00, 0xbf], id: 'capz-nop-matcher-b' },
+      { off: 0x7d14,
+        from: [0x11, 0x78, 0x01, 0x29, 0x6b, 0xd1, 0x62, 0x49, 0x09, 0x78, 0x14, 0x29, 0x67, 0xd2, 0x19, 0x07, 0x09, 0x0f, 0x0b, 0x29, 0x00, 0xd0, 0x02, 0x21, 0x31, 0x70],
+        to:   [0x19, 0x07, 0x09, 0x0f, 0x13, 0x46, 0x9c, 0x3b, 0xc8, 0x26, 0x76, 0x00, 0x05, 0x29, 0x00, 0xd1, 0x76, 0x00, 0x1e, 0x80, 0x00, 0xbf, 0x00, 0xbf, 0x00, 0xbf],
+        id: 'capz-inline' },
+      // boot-init: stub in reserved-vector free space seeds capZ = 400 (22 km/h) before main
+      { off: 0x110,
+        from: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        to:   [0x02, 0x48, 0xc8, 0x21, 0x49, 0x00, 0x01, 0x80, 0x01, 0x48, 0x00, 0x47, 0x5a, 0x03, 0x00, 0x20, 0x49, 0xac, 0x00, 0x00],
+        id: 'capz-boot-stub' },
+      { off: 0x1cc, from: [0x49, 0xac, 0x00, 0x00], to: [0x11, 0x00, 0x00, 0x00], id: 'capz-boot-thunk' },
+      { off: 0x8532, from: [0x30], to: [0x35], id: 'version-marker' }, // bldc version 0.0.0.6 -> 5.5.5.6
+    ],
+  },
+
+  // BLDC 9207 (bldc 0.0.0.7, NT5 Max+ 9201 / Turbo 11101, byte-identical). LZ-.data, same cap1 words.
+  // Magic collides with 9301; version word @0x80 (00 00 00 07) splits them.
+  bldc9207: {
+    label: 'NT5 Max+ / Turbo BLDC 0.0.0.7 (9201/11101)',
+    kind: 'bldc',
+    match: (u8) => u8.length > 0xa0 && bytesAt(u8, 0x90, ascii('SZMC-ES-ZM-02831')) && bytesAt(u8, 0x80, [0x00, 0x00, 0x00, 0x07]),
+    verify: { size: 0xc080, lenOff: 0x84, lenStock: 0x0000ba88, crcOff: 0xb0, crcStock: 0xcaa9 },
+    reseal: bldcResealLz,
+    patches: [
+      { off: 0xbb5f, from: [0x1b, 0x03], to: [0x16, 0x04], id: 'speed-open-a' },
+      { off: 0xbb69, from: [0x1b, 0x03], to: [0x16, 0x04], id: 'speed-open-b' },
     ],
   },
 };
 
-// Identify which approved image this is, or null.
+// Identify which image this is, or null.
 function identify(u8) {
   for (const key of Object.keys(IMAGES)) if (IMAGES[key].match(u8)) return key;
   return null;
 }
 
-// Verify the image is untouched stock (so a wrong or already-patched file is refused, not damaged).
+// Verify the image is untouched stock (a wrong or already-patched file is refused, not damaged).
 function verifyStock(u8, spec) {
   const v = spec.verify;
   if (v.size !== undefined && u8.length !== v.size)
@@ -139,12 +226,12 @@ function applyPatches(u8, patches) {
   return applied;
 }
 
-// Main entry: take the stock .bin (ArrayBuffer), return the patched+resealed image.
-// Throws on an unrecognised, wrong, or already-patched image (never returns a damaged file).
+// Take the stock .bin (ArrayBuffer), return the patched+resealed image. Throws on an unrecognised,
+// wrong or already-patched image (never returns a damaged file).
 function patchFirmware(arrayBuffer) {
   const u8 = new Uint8Array(arrayBuffer.slice(0)); // copy: never mutate the caller's buffer
   const key = identify(u8);
-  if (!key) throw new Error('Unrecognised firmware - not a NAVEE NT5 Max meter or BLDC image.');
+  if (!key) throw new Error('Unrecognised firmware - not a known NAVEE NT5 meter or BLDC image.');
   const spec = IMAGES[key];
 
   const bad = verifyStock(u8, spec);
@@ -158,12 +245,11 @@ function patchFirmware(arrayBuffer) {
     label: spec.label,
     kind: spec.kind,
     applied: applied,
-    speedPending: !!spec.speedPending,
+    nothingToPatch: applied.length === 0,
     bytes: u8,
   };
 }
 
-// Expose for the page and for tests (Node).
 if (typeof window !== 'undefined') {
   window.NVFW = { patchFirmware, identify, crc16Xmodem, IMAGES };
 }

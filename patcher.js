@@ -86,6 +86,7 @@ const IMAGES = {
     patches: [
       { off: 0x14b9f, from: [0xd2], to: [0xe0], id: 'kickstart' },
       { off: 0x14631, from: [0xd0], to: [0xe0], id: 'cruise' },
+      { off: 0x14d1a, from: [0x33], to: [0x35], id: 'version-marker' }, // reported meter version 3.0.2.2 -> 5.0.2.2
     ],
   },
 
@@ -100,6 +101,7 @@ const IMAGES = {
     patches: [
       { off: 0x14ba3, from: [0xd2], to: [0xe0], id: 'kickstart' },
       { off: 0x14635, from: [0xd0], to: [0xe0], id: 'cruise' },
+      { off: 0x14d1e, from: [0x33], to: [0x35], id: 'version-marker' }, // reported meter version 3.0.2.2 -> 5.0.2.2
     ],
   },
 

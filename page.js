@@ -7,6 +7,8 @@ const BUILD = 'v1';
 const $ = (id) => document.getElementById(id);
 let lang = 'de';
 let patchedResult = null;   // { image, label, kind, applied, bytes, srcName }
+let loadedBuf = null;       // last loaded stock .bin (ArrayBuffer), kept so feature toggles re-patch
+let loadedName = '';        // its file name
 let connected = false;
 let flashing = false;
 let detectedModel = null;   // model name from the serial, or null
@@ -92,8 +94,54 @@ function renderResult(r) {
   const note = $('res-note');
   if (r.speedPending) { note.hidden = false; note.textContent = t('note9301'); }
   else { note.hidden = true; note.textContent = ''; }
+  // Bilingual disclaimer (private ground only, ABE voided, not for public roads) before the save button.
+  const disc = $('patch-disclaimer');
+  if (disc) {
+    const de = (window.I18N.de && window.I18N.de.ownDevice) || '';
+    const en = (window.I18N.en && window.I18N.en.ownDevice) || '';
+    disc.textContent = de + (de && en ? '  ' : '') + en;
+  }
   $('btn-save').textContent = t('btnSave');
   refreshFlashUI();
+}
+
+// user-facing label for a feature key (feat.<key>); falls back to the raw key
+function featureLabel(f) { const k = 'feat.' + f; const v = t(k); return v === k ? f : v; }
+// performance features default on; beep-* silences default off so all tones stay by default
+function featureDefault(f) { return f.indexOf('beep') !== 0; }
+function selectedFeatures() {
+  return Array.from(document.querySelectorAll('#feature-checks input[type=checkbox]:checked')).map(c => c.value);
+}
+function renderFeatureChecks(features) {
+  const box = $('feature-checks');
+  if (!box) return;
+  box.innerHTML = '';
+  if (!features || !features.length) { box.hidden = true; return; }
+  box.hidden = false;
+  const head = document.createElement('div');
+  head.className = 'res-k'; head.textContent = t('featTitle');
+  box.appendChild(head);
+  for (const f of features) {
+    const lab = document.createElement('label');
+    lab.className = 'feature-row';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.value = f; cb.checked = featureDefault(f);
+    cb.addEventListener('change', repatch);
+    lab.appendChild(cb);
+    lab.appendChild(document.createTextNode(' ' + featureLabel(f)));
+    box.appendChild(lab);
+  }
+}
+// re-run the patch with the currently checked features (called on load and on every checkbox toggle)
+function repatch() {
+  if (!loadedBuf) return;
+  let r;
+  try { r = window.NVFW.patchFirmware(loadedBuf, selectedFeatures()); }
+  catch (e) { setError(t('errPrefix') + ' ' + e.message); $('result').hidden = true; return; }
+  setError(null);
+  r.srcName = loadedName;
+  patchedResult = r;
+  renderResult(r);
 }
 
 function onFile(file) {
@@ -101,16 +149,11 @@ function onFile(file) {
   $('result').hidden = true;
   const reader = new FileReader();
   reader.onload = () => {
-    let r;
-    try {
-      r = window.NVFW.patchFirmware(reader.result);
-    } catch (e) {
-      setError(t('errPrefix') + ' ' + e.message);
-      return;
-    }
-    r.srcName = file.name;
-    patchedResult = r;
-    renderResult(r);
+    loadedBuf = reader.result; loadedName = file.name;
+    let info = null;
+    try { info = window.NVFW.imageFeatures(new Uint8Array(loadedBuf)); } catch (e) {}
+    renderFeatureChecks(info ? info.features : []);
+    repatch();
   };
   reader.onerror = () => setError(t('errRead'));
   reader.readAsArrayBuffer(file);

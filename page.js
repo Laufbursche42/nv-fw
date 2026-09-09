@@ -3,7 +3,7 @@
 // firmware, load a stock .bin, patch it, save it, then flash it over Web Bluetooth. Everything is
 // client-side; nothing leaves the browser.
 
-const BUILD = 'v1';
+const BUILD = 'v2';
 const $ = (id) => document.getElementById(id);
 let lang = 'de';
 let patchedResult = null;   // { image, label, kind, applied, bytes, srcName }
@@ -11,6 +11,7 @@ let loadedBuf = null;       // last loaded stock .bin (ArrayBuffer), kept so fea
 let loadedName = '';        // its file name
 let connected = false;
 let flashing = false;
+let flashDone = false;      // set once a flash finishes, so the last step shows as done
 let detectedModel = null;   // model name from the serial, or null
 let detectedPid = null;     // 4-digit pid from the serial, or null
 let dlSelectedId = null;    // chosen manifest model id for the download card
@@ -149,7 +150,7 @@ function onFile(file) {
   $('result').hidden = true;
   const reader = new FileReader();
   reader.onload = () => {
-    loadedBuf = reader.result; loadedName = file.name;
+    loadedBuf = reader.result; loadedName = file.name; flashDone = false;
     let info = null;
     try { info = window.NVFW.imageFeatures(new Uint8Array(loadedBuf)); } catch (e) {}
     renderFeatureChecks(info ? info.features : []);
@@ -315,6 +316,17 @@ function renderDownload() {
   if (dlSelectedId) renderDownloadFiles(dlSelectedId);
 }
 
+// Drive the numbered step cards: active = do this now, done = finished, pending = not yet reachable.
+// Loading a stock .bin without connecting is still allowed (desktop), so the patch step opens as soon
+// as either a device is connected or a file is loaded.
+function updateSteps() {
+  const set = (id, state) => { const el = $(id); if (el) el.setAttribute('data-state', state); };
+  set('connect-card', connected ? 'done' : 'active');
+  set('dl-card', !connected ? 'pending' : (loadedBuf ? 'done' : 'active'));
+  set('patch-card', patchedResult ? 'done' : ((connected || loadedBuf) ? 'active' : 'pending'));
+  set('flash-card', (patchedResult && connected) ? (flashDone ? 'done' : 'active') : 'pending');
+}
+
 // enable Flash only with a patched image, consent ticked, connected, and not already flashing
 function refreshFlashUI() {
   const fileEl = $('flash-file');
@@ -330,12 +342,14 @@ function refreshFlashUI() {
     conBtn.disabled = flashing || connected;
     conBtn.textContent = connected ? t('btnConnected') : t('btnConnect');
   }
+  updateSteps();
 }
 
 // Reflect a dropped BLE link in the UI and the log.
 function onDisconnect() {
   if (!connected) return;
   connected = false;
+  flashDone = false;
   setStatus('disconnected');
   log('disconnected');
   refreshFlashUI();
@@ -386,6 +400,7 @@ async function onFlash() {
   };
   try {
     await window.NVFlash.flash(patchedResult.bytes, cb);
+    flashDone = true;
     setPhase(t('flPhDone'));
     flashLog(t('flOk'));
   } catch (e) {

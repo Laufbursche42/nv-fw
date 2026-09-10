@@ -5,7 +5,7 @@ Schritt für Schritt durch das Laufbursche NAVEE Firmware-Werkzeug. Die Seite ba
 ## Was du brauchst
 
 - Einen NAVEE-Scooter. Einschalten und in wenigen Metern Reichweite halten.
-- Ein iPhone oder iPad mit dem Browser **Bluefy** (Safari kann kein Web Bluetooth). Android-Nutzer nehmen die App statt dieser Seite.
+- Ein iPhone oder iPad mit dem Browser **Bluefy** (Safari kann kein Web Bluetooth). Android-Nutzer nehmen den Patcher in der [nv-lb-edition](https://github.com/Laufbursche42/nv-lb-edition) Android-App statt dieser Seite.
 - Bluetooth eingeschaltet.
 
 ## Für welche Modelle

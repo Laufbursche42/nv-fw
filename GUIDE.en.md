@@ -5,7 +5,7 @@ A step-by-step walkthrough of the Laufbursche NAVEE firmware tool. The page buil
 ## What you need
 
 - A NAVEE scooter. Turn it on and keep it within a few meters.
-- An iPhone or iPad with the **Bluefy** browser (Safari has no Web Bluetooth). Android users take the app instead of this page.
+- An iPhone or iPad with the **Bluefy** browser (Safari has no Web Bluetooth). Android users take the patcher in the [nv-lb-edition](https://github.com/Laufbursche42/nv-lb-edition) Android app instead of this page.
 - Bluetooth switched on.
 
 ## Which models

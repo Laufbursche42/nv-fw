@@ -7,7 +7,7 @@ window.I18N = {
     themeToLight: "Auf helle Darstellung umschalten",
     themeToDark: "Auf dunkle Darstellung umschalten",
 
-    iosOnly: "<b>Dieses Tool ist für iPhone und iPad.</b> Es läuft im Browser Bluefy - Safari kann kein Bluetooth. Android-Nutzer nehmen bitte die App: sie patcht und flasht direkt, ohne Umweg über den Browser.",
+    iosOnly: "<b>Dieses Tool ist für iPhone und iPad.</b> Es läuft im Browser Bluefy - Safari kann kein Bluetooth. Android-Nutzer nehmen bitte den Patcher in der <a href=\"https://github.com/Laufbursche42/nv-lb-edition\" target=\"_blank\" rel=\"noopener\">nv-lb-edition</a> Android-App: sie patcht und flasht direkt, ohne Umweg über den Browser.",
     s1Title: "Was das ist",
     sub: "Diese Seite baut aus der Original-Firmware deines NAVEE-Scooters eine entdrosselte Version - Speed-Freischaltung, Kickstart und Tempomat. Sie ist für alle NAVEE-Modelle gedacht. Aktuell testen wir den NT5 Max. Nach und nach stellen wir Patches für weitere Modelle bereit. Alles läuft im Browser, nichts wird hochgeladen oder auf einem Server gespeichert.",
     expWarn: "Machbarkeitsstudie: Diese Seite zeigt, was sich aus der Firmware eines NAVEE-Scooters herausholen lässt, sie ist kein fertiges Produkt. Fehlerfreier Betrieb wird nicht versprochen, es gibt keinerlei Gewährleistung. Was du hier baust und flashst, tust du auf eigenes Risiko. <a href=\"#\" data-open-disclaimer>Haftungsausschluss lesen</a>. Probleme oder Fehler bitte als <a href=\"https://github.com/Laufbursche42/nv-fw/issues\" target=\"_blank\" rel=\"noopener\">GitHub-Issue</a> melden.",
@@ -124,7 +124,7 @@ window.I18N = {
     themeToDark: "Switch to dark theme",
 
     s1Title: "What this is",
-    iosOnly: "<b>This tool is for iPhone and iPad.</b> It runs in the Bluefy browser - Safari has no Bluetooth. Android users should use the app instead: it patches and flashes directly, with no browser detour.",
+    iosOnly: "<b>This tool is for iPhone and iPad.</b> It runs in the Bluefy browser - Safari has no Bluetooth. Android users should use the patcher in the <a href=\"https://github.com/Laufbursche42/nv-lb-edition\" target=\"_blank\" rel=\"noopener\">nv-lb-edition</a> Android app instead: it patches and flashes directly, with no browser detour.",
     sub: "This page builds an unlocked firmware from your NAVEE scooter's own stock image - speed unlock, kickstart and cruise. It is meant for all NAVEE models. We are currently testing the NT5 Max; step by step we add patches for more models. Everything runs in the browser; nothing is uploaded or stored on a server.",
     expWarn: "Feasibility study: this page shows what can be pulled out of a NAVEE scooter's firmware, it is not a finished product. Error-free operation is not promised and there is no warranty of any kind. Whatever you build and flash here, you do at your own risk. <a href=\"#\" data-open-disclaimer>Read the disclaimer</a>. Report problems or errors as a <a href=\"https://github.com/Laufbursche42/nv-fw/issues\" target=\"_blank\" rel=\"noopener\">GitHub issue</a>.",
     startHintGuide: "New here? Every step is in the <a href=\"GUIDE.en.md\" data-doc=\"GUIDE\" data-t=\"footGuide\">guide</a>.",

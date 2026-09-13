@@ -3,7 +3,7 @@
 // firmware, load a stock .bin, patch it, save it, then flash it over Web Bluetooth. Everything is
 // client-side; nothing leaves the browser.
 
-const BUILD = 'v2';
+const BUILD = 'v3';
 const $ = (id) => document.getElementById(id);
 let lang = 'de';
 let patchedResult = null;   // { image, label, kind, applied, bytes, srcName }

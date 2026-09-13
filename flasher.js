@@ -57,13 +57,19 @@ function s6(userId) {
   if (b[0] === 0 || b[0] >= 0x80) b[0] = 0x88;
   return b;
 }
-function authInitFrame(userId, keyIdx) { return writeFrame(0x30, [keyIdx, 0x00, ...s6(userId), 0x00]); }
+function authInitFrame(userId, keyIdx, shareFlag) { return writeFrame(0x30, [keyIdx, shareFlag ? 1 : 0, ...s6(userId), 0x00]); }
 async function aesEcb16(key16, block16) {
   const k = await crypto.subtle.importKey('raw', key16, { name: 'AES-CBC' }, false, ['encrypt']);
   const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-CBC', iv: new Uint8Array(16) }, k, block16));
   return ct.slice(0, 16);
 }
+function xor16(block16, key16) { const o = new Uint8Array(16); for (let i = 0; i < 16; i++) o[i] = (block16[i] ^ key16[i]) & 0xff; return o; }
 async function authRespFrame(resp16) { return writeFrame(0x31, [...resp16]); }
+// OEM 0x6F sub-command 6: clock sync, local epoch seconds (UTC + tz offset), 4 bytes big-endian.
+function timeSyncFrame() {
+  const local = Math.floor(Date.now() / 1000) - (new Date().getTimezoneOffset() * 60);
+  return writeFrame(0x6F, [0x06, (local >>> 24) & 0xff, (local >>> 16) & 0xff, (local >>> 8) & 0xff, local & 0xff]);
+}
 
 function ascii(s) { return Uint8Array.from(Array.from(s).map(c => c.charCodeAt(0))); }
 
@@ -274,21 +280,33 @@ const NVFlash = {
   // the flash continues to dfu_start and works without a userId on any scooter.
   async _authenticate(userId, keyIdx, log) {
     const uid = (userId != null && userId > 0) ? userId : (secRandInt(1000000000) + 1);
+    const shareFlag = (userId != null && userId > 0) ? 1 : 0;
     this.rx.length = 0; this._pending = null;
     log('auth init key=' + keyIdx);
-    await this._write(authInitFrame(uid, keyIdx));
-    let f;
-    try { f = await this._await(this._mFrame(0x30), 4000, 'flErrAuth'); }
-    catch (e) { log('no 0x30 reply - continuing to DFU'); return; }
-    if (f[5] !== 0) { log('0x30 rejected (' + f[5] + ') - continuing to DFU'); return; }
-    const data = f.slice(6, 5 + f[4]);
-    if (data.length >= 16) {
-      const challenge = data.slice(data.length - 16);
-      await this._write(await authRespFrame(await aesEcb16(KEYS[keyIdx], challenge)));
-      try {
-        f = await this._await(this._mFrame(0x31), 4000, 'flErrAuth');
-        if (f[5] === 0) { await this._write(authInitFrame(uid, keyIdx)); await this._await(this._mFrame(0x30), 4000, 'flErrAuth'); }
-      } catch (e) { log('auth handshake incomplete - continuing to DFU'); return; }
+    await this._write(authInitFrame(uid, keyIdx, shareFlag));
+    // Full OEM handshake: two 0x30/0x31 rounds, the challenge answered in the scooter's mode (0 = XOR,
+    // else AES), then clock + 0x7B on the final no-challenge 0x30 so a bound scooter keeps the link.
+    for (let round = 0; round < 4; round++) {
+      let f;
+      try { f = await this._await(this._mFrame(0x30), 4000, 'flErrAuth'); }
+      catch (e) { log('no 0x30 reply - continuing to DFU'); return; }
+      if (f[5] !== 0) { log('0x30 rejected (' + f[5] + ') - continuing to DFU'); return; }
+      const data = f.slice(6, 5 + f[4]);
+      if (data.length < 16) {
+        try { await this._write(timeSyncFrame()); await this._write(readFrame(0x7B)); } catch (e) {}
+        log('auth ok (session armed)');
+        return;
+      }
+      let block, useXor;
+      if (data.length > 16) { useXor = (data[0] === 0); block = data.slice(1, 17); }
+      else { useXor = false; block = data.slice(0, 16); }
+      const resp = useXor ? xor16(block, KEYS[keyIdx]) : await aesEcb16(KEYS[keyIdx], block);
+      await this._write(await authRespFrame(resp));
+      let r;
+      try { r = await this._await(this._mFrame(0x31), 4000, 'flErrAuth'); }
+      catch (e) { log('auth handshake incomplete - continuing to DFU'); return; }
+      if (r[5] !== 0) { log('0x31 rejected (' + r[5] + ') - continuing to DFU'); return; }
+      await this._write(authInitFrame(uid, keyIdx, shareFlag));
     }
     log('auth ok');
   },

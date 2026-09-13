@@ -8,7 +8,7 @@ A static web page that builds a tuned firmware for a NAVEE scooter and flashes i
 
 **Open the web app: [laufbursche42.github.io/nv-fw](https://laufbursche42.github.io/nv-fw/)**
 
-The page is meant for **all NAVEE scooter models**. The download and connect steps work across the line, and the patch step now recognizes most of the fleet: the performance line (NT5, NT3 Pro/Max, GT3/Max/Pro, ST3/ST3 Pro, GT5 Pro/Max), the G5 line, the city and commuter models (S40, S60, S2, V25/V25i, V50i Pro, V45i, N65i, E20 Lite/E25 Go, UT3 Max) and the UT5 Max - each with a checkbox per feature (speed, cruise, zero start, individual beeps). A few models get meter features only (ST5 Pro/Max, UT5 Ultra X, K100 Max). Where a controller cannot be switched safely (some E and V variants, the K100 and Birdie lines) the patcher recognizes the image as stock and does not offer speed. The first flash of any model belongs on a unit you can recover.
+The download and connect steps work across the line, so any NAVEE model can be read. Patching is currently limited to the models confirmed on real hardware: the **NT5 family** and the **XT5**. Patching for other models is disabled in this version while the patches are re-checked.
 
 ## What it does
 
@@ -19,51 +19,15 @@ The page is meant for **all NAVEE scooter models**. The download and connect ste
 
 ## Model support matrix
 
-Two tables: models where all four features are available, and models where at least one is not (yet). Each cell is byte-traced in the firmware, not inferred.
-
-- **Speed** - `patcher` a switchable lock/unlock controller patch (boots throttled to ~22 km/h, opens the top gear per ride, re-locks on restart); `flash-free` lifted over Bluetooth per ride, no flash; `no` no switchable cap on the controller; `no image` the manufacturer publishes no controller firmware for this model.
-- **Kick-start** / **Cruise** / **Warning beeps** - `patcher` region-gated on stock, our patch unlocks/silences it in every region; `stock` already works in every region with no patch; `no` not present in this firmware, or the meter body is external-ROM / compressed and cannot be reached.
-
-### Fully supported
+Patching is currently limited to the models confirmed on real hardware: the **NT5 family** and the **XT5**. Every other model can still connect, download its stock firmware and be read, but patching for those models is **disabled in this version** while the patches are re-checked.
 
 | Model | Speed | Kick-start | Cruise | Warning beeps |
 | --- | --- | --- | --- | --- |
 | NT5 Max, Max+, Turbo, Ultra | patcher | patcher | patcher | patcher |
-| NT3 Pro, Max | patcher | patcher | patcher | patcher |
-| GT3, GT3 Max, GT3 Pro | patcher | patcher | patcher | patcher |
-| ST3, ST3 Pro | patcher | patcher | patcher | patcher |
-| GT5 Pro, Max | patcher | stock | stock | patcher |
-| UT3 Max | patcher | stock | stock | patcher |
-| UT5 Max | patcher | patcher | patcher | patcher |
-| UT5 Ultra X | patcher | patcher | patcher | patcher |
 | NT5 Ultra X | patcher | stock | stock | patcher |
-| S2 | patcher | patcher | patcher | patcher |
-| G5, G5 Pro, G5 Max | patcher | stock | stock | patcher |
-| E20 Lite, E25 Go | patcher | patcher | patcher | patcher |
 | XT5 Pro, Ultra, Max | flash-free | patcher | stock | patcher |
-| ST5 Pro, ST5 Max | patcher | patcher | patcher | patcher |
-| K100 Max | patcher | patcher | stock | patcher |
-| N65i II (10701) | patcher | patcher | patcher | patcher |
 
-### Not fully supported
-
-| Model | Speed | Kick-start | Cruise | Warning beeps |
-| --- | --- | --- | --- | --- |
-| S40, S60 | patcher | no | stock | patcher |
-| V25 / V25i | patcher | no | no | no |
-| V50i Pro | patcher | no | no | no |
-| V45i | patcher | no | no | no |
-| N65i | patcher | no | no | no |
-| V40i, V40i Pro | patcher | no | no | no |
-| V40i Pro II | patcher | no | stock | patcher |
-| V3 Pro | patcher | no | no | no |
-| E45 / E60 Pro | no | patcher | patcher | patcher |
-| E20, E25 | no | no | patcher | patcher |
-| K100, K100 Pro | no | no | no | no |
-| Birdie 3, Birdie 3x | no | no | no | no |
-| N65i II (6001) | no | stock | stock | patcher |
-
-First flash of any model belongs on a unit you can recover; every patch is byte-verified and re-seals deterministically, the on-vehicle confirmation ride is still owed. The V-series controllers (V25 / V25i, V50i Pro, V45i, N65i, V40i / V40i Pro, V40i Pro II, V3 Pro) take the switchable capZ speed latch, so their speed is `patcher`; their kick-start / cruise / beep cells read `no` because those meter bodies are external-ROM-dispatched or compressed and cannot be reached. NT5 Ultra X caps its top speed in the meter (this model ships no controller image), so speed is patched there directly. K100 Max gets a permanent controller top-speed unlock (its own MM32 CRC32 seal), and the N65i II (10701) controller takes the full capZ latch. The remaining speed `no` cells: E20 / E25 have a feasible controller latch but no fwBldc version marker in the image (deferred); N65i II (6001) has the capZ mechanism but no free code space to place a switchable latch (byte-proven); E45 / E60 Pro have no confirmed switchable patch yet; the K100 / K100 Pro controllers and Birdie 3 / 3x (display bridge, no throttle) have no usable path. ST5 Pro / Max hold their speed cap in the METER region gate, so speed is patched there directly.
+Legend: `patcher` a switchable lock/unlock patch (boots throttled to ~22 km/h, opens the top gear per ride, re-locks on restart); `flash-free` lifted live over Bluetooth per ride, no flash; `stock` already works in every region with no patch. The XT5 speed release writes nothing and reverts on restart; the NT5 patch is confirmed on hardware and is reversible by flashing the stock firmware back.
 
 ## Step by step
 

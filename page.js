@@ -3,7 +3,7 @@
 // firmware, load a stock .bin, patch it, save it, then flash it over Web Bluetooth. Everything is
 // client-side; nothing leaves the browser.
 
-const BUILD = 'v4';
+const BUILD = 'v5';
 const $ = (id) => document.getElementById(id);
 let lang = 'de';
 let patchedResult = null;   // { image, label, kind, applied, bytes, srcName }
@@ -90,7 +90,7 @@ function patchedName(srcName) {
 
 function renderResult(r) {
   $('result').hidden = false;
-  $('res-model').textContent = r.label;
+  $('res-model').textContent = r.label + (r.mark ? ' - ' + t('producesFw') + ' ' + r.mark : '');
   $('res-patches').textContent = r.applied.length ? r.applied.join(', ') : t('patchNone');
   const note = $('res-note');
   if (r.speedPending) { note.hidden = false; note.textContent = t('note9301'); }

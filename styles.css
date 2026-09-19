@@ -110,7 +110,9 @@ details > .row, details > .hint { margin-top: 10px; }
 .warn { color: var(--warn); font-size: 12px; background: var(--warn-bg); border: 1px solid var(--warn-line);
   border-radius: 8px; padding: 9px 11px; margin: 0; }
 .warn b { color: var(--warn-strong); }
-.foot { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 4px 0 2px; }
+.foot { margin-top: 2rem; padding-top: 14px; border-top: 1px solid var(--line);
+  color: var(--label); font-size: 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .foot-links, .footlinks { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; }
 .foot a { color: var(--accent); font-size: 12px; text-decoration: none; }
 .foot a:hover { text-decoration: underline; }

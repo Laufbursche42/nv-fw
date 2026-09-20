@@ -199,6 +199,8 @@ input[type="file"]::file-selector-button:hover { border-color: var(--accent); }
 .res-line { font-size: 13px; }
 .err { color: var(--bad); font-size: 12px; font-weight: 600; margin: 0;
   background: var(--bad-bg); border: 1px solid var(--bad-line); border-radius: 8px; padding: 9px 11px; }
+.danger { color: var(--bad); font-size: 13px; font-weight: 700; margin: 0;
+  background: var(--bad-bg); border: 1px solid var(--bad); border-radius: 8px; padding: 10px 12px; }
 
 /* Download list: one row per firmware component. */
 #dl-files { display: flex; flex-direction: column; }

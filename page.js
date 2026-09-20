@@ -3,7 +3,7 @@
 // firmware, load a stock .bin, patch it, save it, then flash it over Web Bluetooth. Everything is
 // client-side; nothing leaves the browser.
 
-const BUILD = 'v9';
+const BUILD = 'v10';
 const $ = (id) => document.getElementById(id);
 let lang = 'de';
 let patchedResult = null;   // { image, label, kind, applied, bytes, srcName }
@@ -95,6 +95,9 @@ function renderResult(r) {
   const note = $('res-note');
   if (r.speedPending) { note.hidden = false; note.textContent = t('note9301'); }
   else { note.hidden = true; note.textContent = ''; }
+  // Red untested-firmware banner for experimental (not hardware-confirmed) images.
+  const exp = $('exp-warn');
+  if (exp) { exp.hidden = !r.experimental; exp.textContent = r.experimental ? t('untestedFwWarn') : ''; }
   // Bilingual disclaimer (private ground only, ABE voided, not for public roads) before the save button.
   const disc = $('patch-disclaimer');
   if (disc) {
@@ -162,6 +165,7 @@ function onFile(file) {
 
 function savePatched() {
   if (!patchedResult) return;
+  if (patchedResult.experimental && !confirm(t('untestedFwConfirm'))) return;
   const blob = new Blob([patchedResult.bytes], { type: 'application/octet-stream' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -388,6 +392,7 @@ async function onConnect() {
 
 async function onFlash() {
   if (!patchedResult || !connected || flashing) return;
+  if (patchedResult.experimental && !confirm(t('untestedFwConfirm'))) return;
   flashing = true;
   refreshFlashUI();
   $('flash-progress').hidden = false;

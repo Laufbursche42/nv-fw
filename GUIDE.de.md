@@ -10,7 +10,7 @@ Schritt für Schritt durch das Laufbursche NAVEE Firmware-Werkzeug. Die Seite ba
 
 ## Für welche Modelle
 
-Die Seite ist für alle NAVEE-Modelle gedacht. Aktuell ist der **NT5 Max** das Modell im Test. Nach und nach kommen Patches für weitere Modelle dazu. Verbinden und Herunterladen funktionieren schon über die ganze Linie. Der Patch-Schritt erkennt derzeit die Meter- und Controller-Abbilder des NT5 Max.
+Bestätigt auf Hardware sind **NT5** plus **XT5**. Die **ST3/GT3-Familie** (ST3 Pro, ST3, GT3, GT3 Pro, GT3 Max) ist neu patchbar, aber **experimentell** - noch nicht auf Hardware bestätigt; flash sie nur, wenn du den Controller retten kannst (SWD oder Ersatz-Controller). Ein Fehlflash ist bei diesen Controllern nicht per Funk rückholbar. Verbinden plus Herunterladen funktionieren über die ganze Linie.
 
 ## Schritt für Schritt
 

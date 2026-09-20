@@ -8,7 +8,7 @@ A static web page that builds a tuned firmware for a NAVEE scooter and flashes i
 
 **Open the web app: [laufbursche42.github.io/nv-fw](https://laufbursche42.github.io/nv-fw/)**
 
-The download and connect steps work across the line, so any NAVEE model can be read. Patching is currently limited to the models confirmed on real hardware: the **NT5 family** and the **XT5**. Patching for other models is disabled in this version while the patches are re-checked.
+The download and connect steps work across the line, so any NAVEE model can be read. Confirmed on real hardware: the **NT5 family** and the **XT5**. The **ST3/GT3 family** (ST3 Pro, ST3, GT3, GT3 Pro, GT3 Max) is now patchable too, but it is **experimental and not yet confirmed on hardware** - only flash it if you can recover the controller (SWD or a spare controller). Every other model stays read-only while its patch is re-checked.
 
 ## What it does
 
@@ -19,15 +19,16 @@ The download and connect steps work across the line, so any NAVEE model can be r
 
 ## Model support matrix
 
-Patching is currently limited to the models confirmed on real hardware: the **NT5 family** and the **XT5**. Every other model can still connect, download its stock firmware and be read, but patching for those models is **disabled in this version** while the patches are re-checked.
+Confirmed on real hardware: the **NT5 family** and the **XT5**. The **ST3/GT3 family is experimental** - patchable but not yet confirmed on hardware; only flash it with a controller recovery route (SWD or a spare) at hand. Every other model can still connect, download its stock firmware and be read, but patching stays **disabled** while its patch is re-checked.
 
 | Model | Speed | Kick-start | Cruise | Warning beeps |
 | --- | --- | --- | --- | --- |
 | NT5 Max, Max+, Turbo, Ultra | patcher | patcher | patcher | patcher |
 | NT5 Ultra X | patcher | stock | stock | patcher |
 | XT5 Pro, Ultra, Max | flash-free | patcher | stock | patcher |
+| ST3 Pro, ST3, GT3, GT3 Pro, GT3 Max (experimental, untested) | patcher | patcher | patcher | patcher |
 
-Legend: `patcher` a switchable lock/unlock patch (boots throttled to ~22 km/h, opens the top gear per ride, re-locks on restart); `flash-free` lifted live over Bluetooth per ride, no flash; `stock` already works in every region with no patch. The XT5 speed release writes nothing and reverts on restart; the NT5 patch is confirmed on hardware and is reversible by flashing the stock firmware back.
+Legend: `patcher` a switchable lock/unlock patch (boots throttled to ~22 km/h, opens the top gear per ride, re-locks on restart); `flash-free` lifted live over Bluetooth per ride, no flash; `stock` already works in every region with no patch. The XT5 speed release writes nothing and reverts on restart; the NT5 patch is confirmed on hardware and is reversible by flashing the stock firmware back. The **ST3/GT3 family is experimental**: its patch is built and statically verified but **not yet confirmed on real hardware**, and a failed flash on these controllers is not recoverable over the air (it needs SWD or a controller swap) - so only flash them if you can recover the unit.
 
 ## Step by step
 

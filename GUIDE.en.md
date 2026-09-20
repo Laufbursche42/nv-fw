@@ -10,7 +10,7 @@ A step-by-step walkthrough of the Laufbursche NAVEE firmware tool. The page buil
 
 ## Which models
 
-The page is meant for all NAVEE models. Right now the **NT5 Max** is the model under test; step by step, patches for more models are added. Connect and download already work across the line; the patch step currently recognizes the NT5 Max meter and controller images.
+Confirmed on hardware: **NT5** and **XT5**. The **ST3/GT3 family** (ST3 Pro, ST3, GT3, GT3 Pro, GT3 Max) is newly patchable but **experimental** - not yet confirmed on hardware; only flash it if you can recover the controller (SWD or a spare), because a failed flash on these controllers is not recoverable over the air. Connect and download work across the line.
 
 ## Step by step
 

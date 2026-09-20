@@ -1,3 +1,5 @@
+> 🚨 **This tool is moving.** This repository is **no longer maintained** - please switch to the new tool: **[lb-webpatcher.laufbursche.workers.dev](https://lb-webpatcher.laufbursche.workers.dev/)**. It patches and flashes the same NAVEE models (and more). Trouble switching? Open an [issue on GitHub](https://github.com/Laufbursche42/Laufbursche42/issues/new) or send a [PM on the eScooter-Stammtisch forum](https://www.escooter-stammtisch.de/index.php?user/6497-laufbursche/).
+
 # Laufbursche NAVEE Firmware
 
 A static web page that builds a tuned firmware for a NAVEE scooter and flashes it over Web Bluetooth. It downloads the stock firmware for your model, patches it in the browser (speed unlock, kickstart and cruise) and writes it back to the scooter over Bluetooth. Nothing to install: no app store, no signing, no developer account. The page is bilingual (German/English, switch in the header) and German is the default.

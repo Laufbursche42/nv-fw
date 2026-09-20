@@ -190,6 +190,13 @@ if [ -f "$REPO_ROOT/scripts/security-scan.py" ]; then
 fi
 
 # =================================================================
+# PHASE E - BLDC payload-bounds guard (no enabled build may write past its image length)
+# =================================================================
+if git diff --cached --name-only 2>/dev/null | grep -qx 'patcher.js' && command -v node >/dev/null 2>&1 && [ -f "$REPO_ROOT/scripts/check-payload-bounds.js" ]; then
+  if node "$REPO_ROOT/scripts/check-payload-bounds.js" "$REPO_ROOT/patcher.js"; then :; else RC=1; fi
+fi
+
+# =================================================================
 echo "-----------------------------------------------------------------"
 if [ "$RC" -ne 0 ]; then
   echo "pre-commit FAILED -- commit blocked. Fix the issues above (bypass a genuine false positive with: git commit --no-verify)."

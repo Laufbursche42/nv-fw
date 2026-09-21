@@ -1,4 +1,4 @@
-> 🚨 **This tool is moving.** This repository is **no longer maintained** - please switch to the new tool: **[lb-webpatcher.laufbursche.workers.dev](https://lb-webpatcher.laufbursche.workers.dev/)**. It patches and flashes the same NAVEE models (and more). Trouble switching? Open an [issue on GitHub](https://github.com/Laufbursche42/Laufbursche42/issues/new) or send a [PM on the eScooter-Stammtisch forum](https://www.escooter-stammtisch.de/index.php?user/6497-laufbursche/).
+> 🚨 **This tool is moving.** This repository is **no longer maintained** - please switch to the new tool: **[lb-webpatcher.pages.dev](https://lb-webpatcher.pages.dev/)**. It patches and flashes the same NAVEE models (and more). Trouble switching? Open an [issue on GitHub](https://github.com/Laufbursche42/Laufbursche42/issues/new) or send a [PM on the eScooter-Stammtisch forum](https://www.escooter-stammtisch.de/index.php?user/6497-laufbursche/).
 
 # Laufbursche NAVEE Firmware
 

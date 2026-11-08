@@ -32,61 +32,61 @@
 
   <div class="sunset-overlay" id="sunset-overlay" role="dialog" aria-modal="true" aria-labelledby="sunset-ov-title">
     <div class="sunset-box">
-      <h2 class="sunset-title" id="sunset-ov-title" data-t="sunsetTitle"></h2>
-      <div class="sunset-text" data-t="sunsetBannerHtml"></div>
-      <button type="button" class="sunset-dismiss" id="sunset-overlay-x" data-t="sunsetDismiss"></button>
+      <h2 class="sunset-title" id="sunset-ov-title" data-t="sunsetTitle">Dieses Tool zieht um</h2>
+      <div class="sunset-text" data-t="sunsetBannerHtml"><b>Dieses Tool zieht um.</b> Dieses Repo wird <b>nicht mehr weiterentwickelt</b> - bitte wechsle zum neuen Tool: <a href="https://lb-webpatcher.pages.dev/" target="_blank" rel="noopener">lb-webpatcher.pages.dev</a>. Probleme beim Wechsel? Öffne ein <a href="https://github.com/Laufbursche42/Laufbursche42/issues/new" target="_blank" rel="noopener">Issue auf GitHub</a> oder schick eine <a href="https://www.escooter-stammtisch.de/index.php?user/6497-laufbursche/" target="_blank" rel="noopener">PN im eScooter-Stammtisch</a>.</div>
+      <button type="button" class="sunset-dismiss" id="sunset-overlay-x" data-t="sunsetDismiss">Verstanden, weiter zur Seite</button>
     </div>
   </div>
-  <div class="sunset-banner" role="alert" data-t="sunsetBannerHtml"></div>
+  <div class="sunset-banner" role="alert" data-t="sunsetBannerHtml"><b>Dieses Tool zieht um.</b> Dieses Repo wird <b>nicht mehr weiterentwickelt</b> - bitte wechsle zum neuen Tool: <a href="https://lb-webpatcher.pages.dev/" target="_blank" rel="noopener">lb-webpatcher.pages.dev</a>. Probleme beim Wechsel? Öffne ein <a href="https://github.com/Laufbursche42/Laufbursche42/issues/new" target="_blank" rel="noopener">Issue auf GitHub</a> oder schick eine <a href="https://www.escooter-stammtisch.de/index.php?user/6497-laufbursche/" target="_blank" rel="noopener">PN im eScooter-Stammtisch</a>.</div>
 
   <div class="card ios-note">
-    <p class="warn" data-t="iosOnly"></p>
+    <p class="warn" data-t="iosOnly"><b>Dieses Tool ist für iPhone und iPad.</b> Es läuft im Browser Bluefy - Safari kann kein Bluetooth. Android-Nutzer nehmen bitte den Patcher in der <a href="https://github.com/Laufbursche42/nv-lb-edition" target="_blank" rel="noopener">nv-lb-edition</a> Android-App: sie patcht und flasht direkt, ohne Umweg über den Browser.</p>
   </div>
 
   <div class="card">
-    <h2 data-t="s1Title"></h2>
-    <p class="hint" data-t="sub"></p>
-    <p class="hint" data-t="startHintGuide"></p>
-    <p class="warn" data-t="expWarn"></p>
-    <p class="hint" data-t="ownDevice"></p>
+    <h2 data-t="s1Title">Was das ist</h2>
+    <p class="hint" data-t="sub">Diese Seite baut aus der Original-Firmware deines NAVEE-Scooters eine entdrosselte Version - Speed-Freischaltung, Kickstart und Tempomat. Bestätigt auf Hardware sind NT5 plus XT5. Die ST3/GT3-Familie (ST3 Pro, ST3, GT3, GT3 Pro, GT3 Max) ist neu patchbar, aber experimentell - noch nicht auf Hardware bestätigt; flash sie nur, wenn du den Controller retten kannst (SWD oder Ersatz). Alles läuft im Browser, nichts wird hochgeladen oder auf einem Server gespeichert.</p>
+    <p class="hint" data-t="startHintGuide">Neu hier? In der <a href="GUIDE.de.md" data-doc="GUIDE" data-t="footGuide">Anleitung</a> steht jeder Schritt.</p>
+    <p class="warn" data-t="expWarn">Machbarkeitsstudie: Diese Seite zeigt, was sich aus der Firmware eines NAVEE-Scooters herausholen lässt, sie ist kein fertiges Produkt. Fehlerfreier Betrieb wird nicht versprochen, es gibt keinerlei Gewährleistung. Was du hier baust und flashst, tust du auf eigenes Risiko. <a href="#" data-open-disclaimer>Haftungsausschluss lesen</a>. Probleme oder Fehler bitte als <a href="https://github.com/Laufbursche42/nv-fw/issues" target="_blank" rel="noopener">GitHub-Issue</a> melden.</p>
+    <p class="hint" data-t="ownDevice">Nur am eigenen Fahrzeug auf privatem Gelände. Die Entdrosselung hebt die ABE auf, auf öffentlichen Wegen ist der Betrieb dann nicht erlaubt.</p>
   </div>
 
   <!-- Step 1: connect and detect the model -->
   <div class="card step" id="connect-card" data-state="active">
-    <div class="card-head" data-step="1"><h2 data-t="conTitle"></h2><button type="button" class="help-btn" data-help="connect" aria-label="Info">?</button></div>
-    <p class="hint" data-t="conHint"></p>
-    <div class="fw-file"><span class="res-k" data-t="conModelK"></span> <span id="con-model" class="mono" data-t="conModelWait"></span></div>
+    <div class="card-head" data-step="1"><h2 data-t="conTitle">Scooter verbinden</h2><button type="button" class="help-btn" data-help="connect" aria-label="Info">?</button></div>
+    <p class="hint" data-t="conHint">Zuerst den Scooter verbinden. Die Seite liest die Seriennummer aus und erkennt daraus das Modell, damit klar ist welche Firmware passt.</p>
+    <div class="fw-file"><span class="res-k" data-t="conModelK">Erkanntes Modell:</span> <span id="con-model" class="mono" data-t="conModelWait">noch nicht verbunden</span></div>
     <div class="btns">
-      <button type="button" id="btn-connect" class="primary span2" data-t="btnConnect"></button>
+      <button type="button" id="btn-connect" class="primary span2" data-t="btnConnect">Scooter verbinden</button>
     </div>
     <p id="con-msg" class="hint" hidden></p>
   </div>
 
   <!-- Step 2: download the stock firmware for the detected model -->
   <div class="card step" id="dl-card" data-state="pending">
-    <h2 data-t="dlTitle" data-step="2"></h2>
-    <div class="fw-file"><span class="res-k" data-t="dlForK"></span> <span id="dl-model" class="mono" data-t="conModelWait"></span></div>
-    <p class="hint" data-t="dlIntro"></p>
+    <h2 data-t="dlTitle" data-step="2">Original-Firmware herunterladen</h2>
+    <div class="fw-file"><span class="res-k" data-t="dlForK">Firmware für:</span> <span id="dl-model" class="mono" data-t="conModelWait">noch nicht verbunden</span></div>
+    <p class="hint" data-t="dlIntro">Lade die Original-.bin für dein Modell. Meter und BLDC sind getrennte Dateien, je nach Ziel brauchst du beide.</p>
     <div id="dl-variants" hidden>
-      <p class="hint" data-t="dlPickVariant"></p>
+      <p class="hint" data-t="dlPickVariant">Für dieses Modell gibt es zwei Firmware-Stände. Wähle nach der Controller-Firmware-Version, die dein Scooter anzeigt.</p>
       <div id="dl-variant-btns" class="btns"></div>
     </div>
     <div id="dl-files"></div>
     <p id="dl-msg" class="hint" hidden></p>
-    <p class="hint" data-t="dlNote"></p>
+    <p class="hint" data-t="dlNote">Der Download öffnet in einem neuen Tab. Die Seite darf die Datei aus CORS-Gründen nicht selbst laden. Speichere die .bin und wähle sie unten aus.</p>
   </div>
 
   <!-- Step 3 + 4: upload the saved .bin and patch it -->
   <div class="card step" id="patch-card" data-state="pending">
-    <h2 data-t="s2Title" data-step="3"></h2>
-    <p class="hint" data-t="loadHint"></p>
+    <h2 data-t="s2Title" data-step="3">Firmware laden und patchen</h2>
+    <p class="hint" data-t="loadHint">Lade die Original-.bin deines Scooters (Meter oder BLDC). Die Seite erkennt die Variante selbst und wendet nur die passenden Patches an - eine falsche oder schon gepatchte Datei wird abgelehnt, nicht beschädigt.</p>
     <div class="row">
       <input type="file" id="fw-in" accept=".bin,application/octet-stream">
     </div>
     <div id="result" class="result" hidden>
       <div id="feature-checks" class="feature-checks" hidden></div>
-      <div class="res-line"><span class="res-k" data-t="resModel"></span> <span id="res-model" class="mono"></span></div>
-      <div class="res-line"><span class="res-k" data-t="resPatches"></span> <span id="res-patches" class="mono"></span></div>
+      <div class="res-line"><span class="res-k" data-t="resModel">Erkannt:</span> <span id="res-model" class="mono"></span></div>
+      <div class="res-line"><span class="res-k" data-t="resPatches">Patches:</span> <span id="res-patches" class="mono"></span></div>
       <p id="res-note" class="hint"></p>
       <p id="exp-warn" class="danger" hidden></p>
       <p id="patch-disclaimer" class="warn"></p>
@@ -97,43 +97,43 @@
 
   <!-- Step 5: flash the patched image to the connected scooter -->
   <div class="card step" id="flash-card" data-state="pending">
-    <div class="card-head" data-step="4"><h2 data-t="s3Title"></h2><button type="button" class="help-btn" data-help="flash" aria-label="Info">?</button></div>
-    <p class="warn" data-t="flashIntro"></p>
-    <div class="fw-file"><span class="res-k" data-t="flashFileK"></span> <span id="flash-file" class="mono" data-t="flashNoFile"></span></div>
+    <div class="card-head" data-step="4"><h2 data-t="s3Title">Auf den Scooter flashen</h2><button type="button" class="help-btn" data-help="flash" aria-label="Info">?</button></div>
+    <p class="warn" data-t="flashIntro">Während des Flashens darf die Verbindung nicht abreißen: Display anlassen, den Browser im Vordergrund halten, den Scooter eingeschaltet und nah am Telefon halten. Bricht die Übertragung ab, verwirft der Scooter das halbe Abbild - übernommen wird es erst nach vollständiger Prüfung.</p>
+    <div class="fw-file"><span class="res-k" data-t="flashFileK">Datei:</span> <span id="flash-file" class="mono" data-t="flashNoFile">noch keine gepatchte Datei</span></div>
     <label class="consent-row">
       <input type="checkbox" id="flash-consent">
-      <span data-t="flashConsent"></span>
+      <span data-t="flashConsent">Ich flashe mein eigenes Gerät auf eigenes Risiko und habe den Hinweis gelesen.</span>
     </label>
     <div class="btns">
-      <button type="button" id="btn-flash" class="primary span2" data-t="btnFlash" disabled></button>
+      <button type="button" id="btn-flash" class="primary span2" data-t="btnFlash" disabled>Flashen</button>
     </div>
     <div id="flash-progress" hidden>
       <div class="fw-bar"><div id="flash-bar"></div></div>
       <div class="prog-line"><span id="flash-pct" class="mono">0%</span> <span id="flash-phase" class="hint"></span></div>
-      <div class="btns"><button type="button" id="btn-cancel" class="span2" data-t="btnCancel"></button></div>
+      <div class="btns"><button type="button" id="btn-cancel" class="span2" data-t="btnCancel">Abbrechen</button></div>
     </div>
   </div>
 
   <!-- Protocol log: full BLE wire activity (TX/RX) plus status messages -->
   <div class="card">
-    <h2 data-t="s6Title"></h2>
+    <h2 data-t="s6Title">Protokoll-Log</h2>
     <div class="btns">
-      <button type="button" id="btn-copy-log" data-t="btnCopyLog"></button>
-      <button type="button" id="btn-clear-log" data-t="btnClearLog"></button>
+      <button type="button" id="btn-copy-log" data-t="btnCopyLog">Log kopieren</button>
+      <button type="button" id="btn-clear-log" data-t="btnClearLog">Log leeren</button>
     </div>
     <pre id="log"></pre>
-    <p class="hint"><span class="log-tx" data-t="logTxLegend"></span>, <span class="log-rx" data-t="logRxLegend"></span></p>
+    <p class="hint"><span class="log-tx" data-t="logTxLegend">TX / blau = gesendet</span>, <span class="log-rx" data-t="logRxLegend">RX / braun = empfangen</span></p>
   </div>
 
   <footer class="foot">
     <span class="foot-links">
-      <a id="link-guide" href="GUIDE.de.md" data-doc="GUIDE" data-t="footGuide"></a>
-      <a href="https://github.com/Laufbursche42/nv-fw" target="_blank" rel="noopener" data-t="footSource"></a>
-      <a id="link-readme" href="README.md" data-doc="README" data-t="footReadme"></a>
-      <a id="link-disclaimer" href="#" data-t="footDisclaimer"></a>
-      <a id="link-license" href="LICENSE.de.md" data-doc="LICENSE" data-t="footLicense"></a>
-      <a id="link-privacy" href="PRIVACY.de.md" data-doc="PRIVACY" data-t="footPrivacy"></a>
-      <a id="link-trademarks" href="TRADEMARKS.de.md" data-doc="TRADEMARKS" data-t="footTrademarks"></a>
+      <a id="link-guide" href="GUIDE.de.md" data-doc="GUIDE" data-t="footGuide">Anleitung</a>
+      <a href="https://github.com/Laufbursche42/nv-fw" target="_blank" rel="noopener" data-t="footSource">Quellcode</a>
+      <a id="link-readme" href="README.md" data-doc="README" data-t="footReadme">Readme</a>
+      <a id="link-disclaimer" href="#" data-t="footDisclaimer">Haftungsausschluss</a>
+      <a id="link-license" href="LICENSE.de.md" data-doc="LICENSE" data-t="footLicense">Lizenz</a>
+      <a id="link-privacy" href="PRIVACY.de.md" data-doc="PRIVACY" data-t="footPrivacy">Datenschutz</a>
+      <a id="link-trademarks" href="TRADEMARKS.de.md" data-doc="TRADEMARKS" data-t="footTrademarks">Marken</a>
     </span>
     <span class="ver" id="build-ver"></span>
     <a class="foot-copy" href="https://laufbursche42.github.io/Laufbursche42/" target="_blank" rel="noopener">Copyright (c) 2026 Laufbursche</a>
@@ -147,7 +147,7 @@
   </div>
   <div class="doc-body" id="doc-body"></div>
   <div class="doc-foot">
-    <button type="button" id="doc-close" data-t="docClose"></button>
+    <button type="button" id="doc-close" data-t="docClose">Schließen</button>
   </div>
 </dialog>
 
@@ -158,7 +158,7 @@
   </div>
   <div class="doc-body" id="help-body"></div>
   <div class="doc-foot">
-    <button type="button" id="help-close" data-t="docClose"></button>
+    <button type="button" id="help-close" data-t="docClose">Schließen</button>
   </div>
 </dialog>
 
